@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "CBoard2.h"
+#include "Board2.h"
 
 int neighbours (int i, int j);
 char decideCell (int old, int nn);
