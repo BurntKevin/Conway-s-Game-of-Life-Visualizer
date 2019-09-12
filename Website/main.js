@@ -209,10 +209,10 @@ function clearBoard() {
 // Randomise board
 function randomBoard() {
     var cells = document.getElementsByClassName("potentialCell");
-    var porbability = document.getElementById("probabilitySlider");
+    var probability = document.getElementById("probabilitySlider");
     for (var i = 0; i < cells.length; i++) {
         var number = Math.floor((Math.random() * 100) + 1);
-        if (porbability.value < number) {
+        if (probability.value < number) {
             // Dead cell
             cells[i].className = "potentialCell";
         } else {
