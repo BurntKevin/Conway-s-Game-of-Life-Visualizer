@@ -80,3 +80,13 @@ body {
 .cellAlive {
     background-color: rgb(83, 96, 153);
 }
+
+/* Footer */
+.footer {
+    background-color: rgb(61, 127, 189);
+    text-align: center;
+    color: white;
+    position: absolute;
+    width: 100%;
+    bottom: 0px;
+}
