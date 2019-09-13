@@ -1,3 +1,6 @@
+# Project Status
+The C and MIPS implementation is complete. The website implementation is a rough core of what features it has. Development has been moved to another repository.
+
 # Conway's Game of Life
 
 Conway's Game of Life is a fascinating simulation highlighting the many ways an entity can develop and I wanted to visualize it in a fun neat program.
