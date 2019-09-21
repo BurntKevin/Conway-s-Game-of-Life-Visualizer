@@ -1,0 +1,443 @@
+Session: 19T2
+Assignment: assign1  Submission ID: 5264837
+
+
+Your submission has been marked. + /usr/bin/less -m /import/glass/3/z5264837/cs1521.assign1.mrk
+
+!!section banner
+#######  #####   #####  #        #####   #####  #######
+#       #     # #     # #    #  #     # #     # #    #
+#             # #       #    #  #     #       #     #
+ #####   #####  ######  #######  #####   #####     #
+      # #       #     #      #  #     #       #   #
+#     # #       #     #      #  #     # #     #   #
+ #####  #######  #####       #   #####   #####    #
+
+Chu, Kevin                              5264837
+
+Submissions:-
+
+S 0     Sat Jul 13 13:07:33 2019        5264837 tue16-oboe assign1 -3:-19
+S 1     Tue Jul 16 18:52:18 2019        5264837 tue16-oboe assign1 0:-14
+
+Thu Jul 25 14:08:01 2019                ## organ16.orchestra.cse.unsw.EDU.AU ##
+!!section listing
+-rw-r----- z5264837/z5264837 9143 2019-07-16 18:46 prog.s
+dos2unix: converting file prog.s to Unix format ...
+
+===============================================================================
+-rw-r----- 1 cs1521 cs1521 9143 Jul 25 14:08 prog.s
+===============================================================================
+
+     1  # COMP1521 19t2 ... Game of Life on a NxN grid
+     2  #
+     3  # Written by Kevin, June 2019
+     4
+     5  ## Requires (from `boardX.s'):
+     6  # - N (word): board dimensions
+     7  # - board (byte[][]): initial board state
+     8  # - newBoard (byte[][]): next board state
+     9
+    10          .data
+    11  iterationNumber: .asciiz "# Iterations: "
+    12  iterationAfterP1: .asciiz "=== After iteration "
+    13  iterationAfterP2: .asciiz " ===\n"
+    14  dot: .asciiz "."
+    15  hashtag: .asciiz "#"
+    16  newLine: .asciiz "\n"
+    17
+    18  ## Provides:
+    19          .globl  main
+    20          .globl  decideCell
+    21          .globl  neighbours
+    22          .globl  copyBackAndShow
+    23
+    24  ########################################################################
+    25  # .TEXT <main>
+    26          .text
+    27
+    28  main:
+    29  # Frame:        ...
+    30  # Uses:         ...
+    31  # Clobbers:     ...
+    32
+    33  # Locals:       ...
+    34
+    35  # Structure:
+    36  #       main
+    37  #       -> [prologue]
+    38  #       -> ...
+    39  #       -> [epilogue]
+    40
+    41  # Code:
+    42
+    43          # Your main program code goes here.  Good luck!
+    44
+    45          # $s0 = maxiters, $s1 = n, $s2 = i
+    46          # $s3 = N, $s4 = j, $s5 = nn
+    47          # t0 = rowSize, $t1 = matrixSize
+    48          # $t2 = matrixAddress, $t3 = matrixStartAddress, $t4 = matrixValue
+                  ^
+                  + ===== +
+                  + Good! +
+                  + ===== +
+    49
+    50          # Set up stack frame
+    51          sw $fp, -4($sp) # Push $fp
+    52          la $fp, -4($sp) # Set up $fp
+    53          sw $ra, -4($fp) # Save $ra
+    54          sw $s0, -8($fp) # Save $s0
+    55          sw $s1, -12($fp)        # Save $s1
+    56          sw $s2, -16($fp)        # Save $s2
+    57          sw $s3, -20($fp)        # Save $s3
+    58          sw $s4, -24($fp)        # Save $s4
+    59          sw $s5, -28($fp)        # Save $s5
+    60          addi $sp, $sp, -32      # Update $sp
+    61
+    62          lw $s3, N       # Obtaining N
+    63
+    64          # Reserving $s0 for maxiters    # int maxiters
+    65
+    66          li $v0, 4       # printf("# Iterations: ")
+    67          la $a0, iterationNumber
+    68          syscall
+    69
+    70          li $v0, 5       # scanf("%d", &maxiters)
+    71          syscall
+    72          move $s0, $v0
+    73
+    74          li $s1, 1       # int n = 1
+    75          loopNumberOfIterations: # Level 1 while loop
+    76                  bgt $s1, $s0, endLoopNumberOfIterations # n <= maxiter condition
+    77
+    78                  li $s2, 0       # int i = 0
+    79                  loopSizeOfRow:  # Level 2 while loop
+    80                  bge $s2, $s3, endLoopSizeOfRow  # i < N condition
+    81
+    82                          li $s4, 0       # int j = 0
+    83                          loopSizeOfColumn:       # Level 3 while loop
+    84                                  bge $s4, $s3, endLoopSizeOfColumn       # j < N condition
+    85
+    86                                  move $a0, $s2   # Passing i
+    87                                  move $a1, $s4   # Passing j
+    88                                  jal neighbours  # Calling neighbour function
+    89                                  move $s5, $v0   # int nn = neighbours(i, j)
+    90
+    91                                  # Calculating matrixSize for [i][j]
+    92                                  mul $t0, $s2, $s3       # rowSize = rowSize * N
+    93                                  addu $t1, $t0, $s4      # matrixSize = rowSize + column
+    94
+    95                                  lb $t4, board($t1);     # matrixValue = board[i][j]'s value
+    96                                  move $a0, $t4   # Passing board[i][j]
+    97                                  move $a1, $s5   # Passing nn
+    98                                  jal decideCell  # decideCell(board[i][j], nn)
+    99
+   100                                  sb $v0, newBoard($t1)   # newBoard[i][j] = decideCell(board[i][j], nn)
+   101
+   102                                  addi $s4, $s4, 1        # j++
+   103                                  j loopSizeOfColumn
+   104                          endLoopSizeOfColumn:
+   105
+   106                          addi $s2, $s2, 1        # i++
+   107                          j loopSizeOfRow
+   108                  endLoopSizeOfRow:
+   109
+   110                  # printf("=== After iteration %d ===\n", n);
+   111                  li $v0, 4       # printf("=== After iteration ")
+   112                  la $a0, iterationAfterP1
+   113                  syscall
+   114
+   115                  li $v0, 1       # printf("%d", n)
+   116                  move $a0, $s1
+   117                  syscall
+   118
+   119                  li $v0, 4       # printf(" ===\n")
+   120                  la $a0, iterationAfterP2
+   121                  syscall
+   122
+   123                  jal copyBackAndShow     # copyBackAndShow()
+   124
+   125                  addi $s1, $s1, 1        # n++
+   126                  j loopNumberOfIterations
+   127          endLoopNumberOfIterations:
+   128
+   129          # Remove stack frame
+   130          lw $s5, -28($fp)        # Restore $s5
+   131          lw $s4, -24($fp)        # Restore $s4
+   132          lw $s3, -20($fp)        # Restore $s3
+   133          lw $s2, -16($fp)        # Restore $s2
+   134          lw $s1, -12($fp)        # Restore $s1
+   135          lw $s0, -8($fp) # Restore $s0
+   136          lw $ra, -4($fp) # Restore $ra
+   137          la $sp, 4($fp)  # Restore $sp
+   138          lw $fp, ($fp)   # Restore $fp
+   139
+   140          li $v0, 0       # Return 0
+   141          jr      $ra
+   142
+   143          # Put your other functions here
+   144
+   145  decideCell:
+   146          #s0 = old, $s1 = nn, $s2 = ret
+   147
+   148          # Set up stack frame
+   149          sw $fp, -4($sp) # Push $fp
+   150          la $fp, -4($sp) # Set up $fp
+   151          sw $ra, -4($fp) # Save $ra
+   152          sw $s0, -8($fp) # Save $s0
+   153          sw $s1, -12($fp)        # Save $s1
+   154          sw $s2, -16($fp)        # Save $s2
+   155          addi $sp, $sp, -20      # Update $sp
+   156
+   157          # Reserving $s2 for char ret    # char ret
+   158
+   159          move $s0, $a0   # Loading old
+   160          move $s1, $a1   # Loading nn
+   161
+   162          ifAliveCell:    # Major if statement
+   163                  bne $s0, 1, elseIfThreeNeighbours       # old == 1 condition
+   164
+   165                  ifLessThanTwoNeighbours:        # Sub if statement
+   166                          bge $s1, 2, elseifTwoOrThreeNeighbours  # nn < 2 condition
+   167
+   168                          li $s2, 0       # ret = 0
+   169
+   170                          j endStatusCheck
+   171                  elseifTwoOrThreeNeighbours:     # Sub elseif statement
+   172                          beq $s1, 2, elseifTwoOrThreeNeighboursConditionMet      # nn == 2 condition
+   173                          beq $s1, 3, elseifTwoOrThreeNeighboursConditionMet      # nn == 3 condition
+   174
+   175                          j elseOtherAmountsOfNeighbours
+   176                          elseifTwoOrThreeNeighboursConditionMet:
+   177                          li $s2, 1       # ret = 1
+   178
+   179                          j endStatusCheck
+   180                  elseOtherAmountsOfNeighbours:   # Sub else statement
+   181                          li $s2, 0       # ret = 0
+   182
+   183                          j endStatusCheck
+   184          elseIfThreeNeighbours:
+   185                  bne $s1, 3, elseNotAliveOrNoThreeNeighbours     # nn == 3 condition
+   186
+   187                  li $s2, 1       # ret = 1
+   188
+   189                  j endStatusCheck
+   190          elseNotAliveOrNoThreeNeighbours:
+   191                  li $s2, 0       # ret = 0
+   192          endStatusCheck:
+   193
+   194          move $v0, $s2   # Saving ret value
+   195
+   196          # Remove stack frame
+   197          lw $s2, -16($fp)        # Restore $s2
+   198          lw $s1, -12($fp)        # Restore $s1
+   199          lw $s0, -8($fp) # Restore $s0
+   200          lw $ra, -4($fp) # Restore $ra
+   201          la $sp, 4($fp)  # Restore $sp
+   202          lw $fp, ($fp)   # Restore $fp
+   203
+   204          jr $ra  # Return ret
+   205
+   206  neighbours:
+   207          # $s0 = i, $s1 = j
+   208          # $s2 = nn, $s3 = x, $s4 = y, $s5 = N
+   209          # $t0 = i + x, $t1 = N - 1, $t2 = j + y
+   210          # $t3 = rowSize, $t4 = matrixSize, $t5 = board[i + x][j + y]
+   211
+   212          # Set up stack frame
+   213          sw $fp, -4($sp) # Push $fp
+   214          la $fp, -4($sp) # Set up $fp
+   215          sw $ra, -4($fp) # Save $ra
+   216          sw $s0, -8($fp) # Save $s0
+   217          sw $s1, -12($fp)        # Save $s1
+   218          sw $s2, -16($fp)        # Save $s2
+   219          sw $s3, -20($fp)        # Save $s3
+   220          sw $s4, -24($fp)        # Save $s4
+   221          sw $s5, -28($fp)        # Save $s5
+   222          addi $sp, $sp, -32      # Update $sp
+   223
+   224          lw $s5, N       # Loading N
+   225          move $s0, $a0   # Loading i
+   226          move $s1, $a1   # Loading j
+   227
+   228          li $s2, 0       # nn = 0
+   229
+   230          li $s3, -1      # x = -1
+   231          forXCoordinate: # Cycle through nearby X coordinates
+   232                  bgt $s3, 1, endForXCoordinate   # x <= 1 condition
+   233
+   234                  li $s4, -1      # y = -1
+   235                  forYCoordinate: # Cycle through nearby Y coordinates
+   236                          bgt $s4, 1, endForYCoordinate   # y <= 1 condition
+   237
+   238                          ifAtLeftOrRightWall:    # Outside of board on the x-axis
+   239                                  add $t0, $s0, $s3       # i + x calculation
+   240                                  bltz $t0, ifAtLeftOrRightWallConditionMet       # i + x < 0 condition
+   241
+   242                                  addi $t1, $s5, -1       # N - 1 calculation
+   243                                  bgt $t0, $t1, ifAtLeftOrRightWallConditionMet   # i + x > N - 1 condition
+   244                                  j ifAtAboveOrBelowWall
+   245
+   246                                  ifAtLeftOrRightWallConditionMet:
+   247                                  j finalisingforYCoordinate      # continue
+   248                          ifAtAboveOrBelowWall:   # Outside of board on the y-axis
+   249                                  add $t2, $s1, $s4       # j + y calculation
+   250                                  bltz $t2, ifAtAboveOrBelowWallConditionMet      # j + y < 0 condition
+   251
+   252                                  addi $t1, $s5, -1       # N - 1 calculation
+   253                                  bgt $t2, $t1, ifAtAboveOrBelowWallConditionMet  # j + y > N - 1 condition
+   254                                  j ifAtPoint
+   255                                  ifAtAboveOrBelowWallConditionMet:
+   256                                  j finalisingforYCoordinate      # continue
+   257                          ifAtPoint:      # The point is not a neighbour of itself
+   258                                  bne $s3, 0, ifNeighbourPresent  # x == 0 condition
+   259                                  bne $s4, 0, ifNeighbourPresent  # y == 0 condition
+   260
+   261                                  j finalisingforYCoordinate      # continue
+   262                          ifNeighbourPresent:
+   263                                  # Calculating matrixSize for [i + x][j + y]
+   264                                  add $t0, $s0, $s3       # i + x calculation
+   265                                  mul $t3, $t0, $s5       # rowSize = rowSize * N
+   266                                  add $t2, $s1, $s4       # j + y calculation
+   267                                  addu $t4, $t3, $t2      # matrixSize = rowSize + column
+   268
+   269                                  lb $t5, board($t4);     # Loading board[i + x][j + y]
+   270                                  bne $t5, 1, finalisingforYCoordinate    # board[i + x][j + y] == 1 condition
+   271                                  addi $s2, $s2, 1        # nn++
+   272                          finalisingforYCoordinate:
+   273                          addi $s4, $s4, 1        # y++
+   274                          j forYCoordinate
+   275
+   276                  endForYCoordinate:
+   277
+   278                  addi $s3, $s3, 1        # x++
+   279                  j forXCoordinate
+   280          endForXCoordinate:
+   281
+   282          move $v0, $s2   # Returning nn
+   283
+   284          # Remove stack frame
+   285          lw $s5, -28($fp)        # Restore $s5
+   286          lw $s4, -24($fp)        # Restore $s4
+   287          lw $s3, -20($fp)        # Restore $s3
+   288          lw $s2, -16($fp)        # Restore $s2
+   289          lw $s1, -12($fp)        # Restore $s1
+   290          lw $s0, -8($fp) # Restore $s0
+   291          lw $ra, -4($fp) # Restore $ra
+   292          la $sp, 4($fp)  # Restore $sp
+   293          lw $fp, ($fp)   # Restore $fp
+   294
+   295          jr $ra  # Returning nn
+   296
+   297  copyBackAndShow:
+   298          # Set up stack frame
+   299          sw $fp, -4($sp) # Push $fp
+   300          la $fp, -4($sp) # Set up $fp
+   301          sw $ra, -4($fp) # Save $ra
+   302          sw $s0, -8($fp) # Save $s0
+   303          sw $s1, -12($fp)        # Save $s1
+   304          sw $s2, -16($fp)        # Save $s2
+   305          addi $sp, $sp, -20      # Update $sp
+   306
+   307          # $s0 = i, $s1 = N, $s2 = j
+   308          # $t0 = rowSize, $t1 = matrixSize, $t2 = board[i][j], $t3 = newBoard[i][j]
+   309
+   310          lw $s1, N       # Loading N
+   311
+   312          li $s0, 0       # int i = 0
+   313
+   314          forRowSize:     # Going through the X coordinates
+   315                  bge $s0, $s1, endForRowSize     # i < N condition
+   316
+   317                  li $s2, 0       # int j = 0
+   318                  forColumnSize:  # Going through the Y coordinates
+   319                          bge $s2, $s1, endForColumnSize  # j < N condition
+   320
+   321                          # Calculating matrixSize for [i][j]
+   322                          mul $t0, $s0, $s1       # rowSize = rowSize * N
+   323                          addu $t1, $t0, $s2      # matrixSize = rowSize + column
+   324
+   325                          lb $t3, newBoard($t1)   # Loading newBoard[i][j]
+   326
+   327                          sb $t3, board($t1)      # board[i][j] = newBoard[i][j]
+   328                          ifDead:
+   329                                  lb $t2, board($t1)      # Loading board[i][j]
+   330
+   331                                  bnez $t2, elseAlive     # board[i][j] == 0 condition
+   332
+   333                                  li $v0, 4       # putchar('.')
+   334                                  la $a0, dot
+   335                                  syscall
+   336
+   337                                  j endIfDead
+   338                          elseAlive:
+   339                                  li $v0, 4       # putchar('#')
+   340                                  la $a0, hashtag
+   341                                  syscall
+   342                          endIfDead:
+   343
+   344                          addi $s2, $s2, 1        # j++
+   345                          j forColumnSize
+   346                  endForColumnSize:
+   347
+   348                  li $v0, 4       # putchar('\n')
+   349                  la $a0, newLine
+   350                  syscall
+   351
+   352                  addi $s0, $s0, 1        # i++
+   353                  j forRowSize
+   354          endForRowSize:
+   355
+   356          # Remove stack frame
+   357          lw $s2, -16($fp)        # Restore $s2
+   358          lw $s1, -12($fp)        # Restore $s1
+   359          lw $s0, -8($fp) # Restore $s0
+   360          lw $ra, -4($fp) # Restore $ra
+   361          la $sp, 4($fp)  # Restore $sp
+   362          lw $fp, ($fp)   # Restore $fp
+   363
+   364          jr $ra  # Returning
+
+Running tests ...
+PASSED test 1
+PASSED test 2
+PASSED test 3
+PASSED test 4
+PASSED test 5
+PASSED test 6
+PASSED test 7
+PASSED test 8
+PASSED test 9
+!!section tests
+!!section assess
+9 tests run; 9 tests passed; 0 tests failed
+
+--- Checking for missing symbols ...
+
+--- Checking for stack frames ...
+            main: 19
+      decideCell: 13
+ copyBackAndShow: 13
+      neighbours: 19
+
+!!specialmark  (Correctness)                            7.0/7
+
+!!marktab       **  MARKER'S  ASSESSMENT  **
+
+                             Commentary   (1)   1
+
+                             Readability  (1)   1
+ ^
++ ============================================================================================================ +
++ Great work! Very readable code. Your labels were all well named. Copying and pasting the actual C code and   +
++ +                                                                                                            +
++ + embedding it more consistently would make it a little more readable.                                       +
++   +                                                                                                          +
++ + ======                                                                                                     +
++ ============================================================================================================ +
+!!finalmark     **  FINAL  ASSIGNMENT  MARK:    9/9
+
+Chu, Kevin                              5264837
+
+
+Marked by z5157383 on Fri Jul 26 14:49:33 2019
