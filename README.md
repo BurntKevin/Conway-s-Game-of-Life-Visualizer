@@ -18,6 +18,3 @@ It is interesting that although there are seemingly infinite patterns, these pat
 
 # C and MIPS Implementation
 Both programs are performing the same application. The programs use a reference board and then you get to select the number of iterations where a terminal output will show every iteration until it is complete.
-
-# Website Implementation
-There is a grid with 50px by 50px cells filling the page where these cells can be clicked on or by holding mouse 1 over the cells to make the cells alive or dead. There is the standard run and stop features so that it is possible to visualize the simulation. In addition, it also has a clear board, auto-fill cells with a probability slider, custom speed of iterations and custom size which adjusts the density of cells on the page.
