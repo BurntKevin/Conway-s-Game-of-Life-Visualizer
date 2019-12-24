@@ -1,0 +1,53 @@
+/* Additions to Materialize CSS */
+.buttons {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+.buttons > * {
+    margin: 10px;
+    opacity: 0.85;
+}
+
+.button {
+    cursor: pointer;
+}
+
+.button:hover {
+    opacity: 1;
+}
+
+.slider {
+    opacity: 0.85;
+    -webkit-appearance: none;
+    width: 125px;
+    height: 15px;
+}
+
+.slider:hover {
+    opacity: 1;
+}
+
+/* Grid Board */
+.grid {
+    display: grid;
+    height: calc(100vh);
+    padding: 10px;
+}
+
+.potentialCell {
+    background-color: rgb(227, 228, 226);
+    border: 1px solid rgb(63, 84, 65);
+    cursor: pointer;
+    opacity: 0.85;
+}
+
+.potentialCell:hover {
+    opacity: 1;
+}
+
+.cellAlive {
+    background-color: rgb(99, 203, 241);
+}
