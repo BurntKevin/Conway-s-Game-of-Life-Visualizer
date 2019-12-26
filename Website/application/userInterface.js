@@ -1,3 +1,15 @@
+// Speed Slider
+document.getElementById("speedSlider").oninput = function() {
+    // If simulation is running, adjust timer to the new speed
+    if (running == true) {
+        stopBoard();
+        startBoard();
+    }
+
+    // Update speed value displayed to user
+    document.getElementById("speedDisplay").innerHTML = this.value + "ms";
+}
+
 // Probability Slider
 document.getElementById("probabilitySlider").oninput = function() {
     // Updating probability displayed
