@@ -5,6 +5,7 @@ To provide an easily accessible simulation of Conway's Game of Life.
 * Buttons placed on the top.
 * User can run, stop, clear, create a random board, adjust simulation speed, adjust board speed and visualise Conway's Game of Life.
 * Board is gray with a highly dark green border and light blue alive cells.
+* Board defaults to filling the screen with 50 by 50 pixels.
 
 # Designs #
 ## Functionality ##
